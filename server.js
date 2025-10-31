@@ -111,12 +111,55 @@ app.post("/api/waitlist", async (req, res) => {
             <html>
             <head>
               <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                body {
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                  background: linear-gradient(135deg, #0f1419 0%, #1a1d29 100%);
+                  margin: 0;
+                  padding: 20px;
+                  color: #e4e7eb;
+                  min-height: 100vh;
+                }
                 .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-                .highlight { background: #667eea; color: white; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0; }
-                .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                .header {
+                  background: linear-gradient(135deg, #d97757 0%, #f4976c 100%);
+                  color: #0f1419;
+                  padding: 30px;
+                  text-align: center;
+                  border-radius: 10px 10px 0 0;
+                  box-shadow: 0 4px 15px rgba(217, 119, 87, 0.3);
+                }
+                .content {
+                  background: #1e2330;
+                  padding: 30px;
+                  border-radius: 0 0 10px 10px;
+                  border: 1px solid #2d3748;
+                  border-top: none;
+                }
+                .highlight {
+                  background: linear-gradient(135deg, #d97757 0%, #f4976c 100%);
+                  color: #0f1419;
+                  padding: 20px;
+                  border-radius: 12px;
+                  text-align: center;
+                  margin: 20px 0;
+                  box-shadow: 0 4px 15px rgba(217, 119, 87, 0.3);
+                }
+                .highlight h2 { margin: 0; font-weight: 600; }
+                .highlight h1 {
+                  margin: 10px 0 0 0;
+                  font-size: 48px;
+                  font-weight: 700;
+                }
+                .footer {
+                  text-align: center;
+                  margin-top: 20px;
+                  color: #9ca3af;
+                  font-size: 12px;
+                }
+                .content p { color: #e4e7eb; line-height: 1.6; }
+                .content ul { color: #e4e7eb; padding-left: 20px; }
+                .content li { margin-bottom: 8px; }
+                .content strong { color: #f2a98c; }
               </style>
             </head>
             <body>
@@ -130,10 +173,8 @@ app.post("/api/waitlist", async (req, res) => {
                     process.env.APP_NAME || "Chimera"
                   }</strong> !</p>
                   <div class="highlight">
-                    <h2 style="margin: 0;">Votre position</h2>
-                    <h1 style="margin: 10px 0; font-size: 48px;">#${
-                      entry.position
-                    }</h1>
+                    <h2>Votre position</h2>
+                    <h1>#${entry.position}</h1>
                   </div>
                   <p>Vous êtes maintenant sur notre liste d'attente exclusive. Nous vous tiendrons informé(e) dès que nous serons prêts à lancer !</p>
                   <p><strong>Que se passe-t-il ensuite ?</strong></p>
