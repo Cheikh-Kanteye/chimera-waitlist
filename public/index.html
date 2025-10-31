@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chimera - Waitlist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="logo">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="30" cy="30" r="28" stroke="url(#gradient)" stroke-width="4"/>
+                    <path d="M20 30 L28 38 L42 22" stroke="url(#gradient)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f2a98c;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#d97757;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1 class="title">
+                Chimera
+                <span class="badge">Beta</span>
+            </h1>
+            <p class="subtitle">
+                Transformez vos APIs en outils intelligents avec l'IA générative
+            </p>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🤖</div>
+                <h3>IA Générative</h3>
+                <p>Interagissez avec vos APIs via un chat intelligent</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Auto-Discovery</h3>
+                <p>Découverte automatique des endpoints d'API</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <h3>UI Dynamique</h3>
+                <p>Génération automatique d'interfaces adaptées</p>
+            </div>
+        </div>
+
+        <!-- Waitlist Form -->
+        <div class="waitlist-section">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="waitlist-count">...</div>
+                    <div class="stat-label">Personnes inscrites</div>
+                </div>
+            </div>
+
+            <form id="waitlist-form" class="form">
+                <h2>Rejoignez la waitlist 🚀</h2>
+                <p class="form-subtitle">Soyez parmi les premiers à tester Chimera</p>
+
+                <div class="form-group">
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Votre nom (optionnel)"
+                        class="input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Votre email *"
+                        class="input"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn" id="submit-btn">
+                    <span class="btn-text">Rejoindre la waitlist</span>
+                    <span class="btn-loader" style="display: none;">
+                        <svg class="spinner" viewBox="0 0 50 50">
+                            <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                        </svg>
+                    </span>
+                </button>
+
+                <p class="form-note">
+                    En vous inscrivant, vous recevrez un email de confirmation et des mises à jour exclusives.
+                </p>
+            </form>
+
+            <!-- Success Message -->
+            <div id="success-message" class="success-message" style="display: none;">
+                <div class="success-icon">🎉</div>
+                <h3>Inscription réussie !</h3>
+                <p>Vous êtes maintenant sur la liste d'attente.</p>
+                <div class="position">
+                    Position: <span id="position-number">#0</span>
+                </div>
+                <p class="success-note">Un email de confirmation vous a été envoyé.</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="error-message" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <p id="error-text">Une erreur est survenue</p>
+                <button class="btn-retry" onclick="resetForm()">Réessayer</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 Chimera. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="#" class="social-link">Twitter</a>
+                <a href="#" class="social-link">GitHub</a>
+                <a href="#" class="social-link">Discord</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
