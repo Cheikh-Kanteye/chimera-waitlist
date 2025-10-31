@@ -8,6 +8,16 @@ export default async function handler(req, res) {
   }
 
   try {
+    const { password } = req.query;
+
+    // Check password
+    if (password !== "Ms2chsnnjj&kk") {
+      return res.status(401).json({
+        success: false,
+        message: "Accès non autorisé",
+      });
+    }
+
     const waitlist = (await kv.get("waitlist")) || [];
     res.json({
       success: true,

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Chimera Waitlist</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <style>
+      .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .password-form {
+        max-width: 400px;
+        margin: 50px auto;
+        background: #1e2330;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #2d3748;
+        text-align: center;
+      }
+      .password-form h2 {
+        color: #e4e7eb;
+        margin-bottom: 20px;
+      }
+      .password-input {
+        width: 100%;
+        padding: 12px;
+        background: #0f1419;
+        border: 1px solid #2d3748;
+        border-radius: 5px;
+        color: #e4e7eb;
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+      .password-input:focus {
+        outline: none;
+        border-color: #d97757;
+      }
+      .btn-admin {
+        background: linear-gradient(135deg, #d97757 0%, #f4976c 100%);
+        color: #0f1419;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .btn-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(217, 119, 87, 0.3);
+      }
+      .waitlist-table {
+        width: 100%;
+        background: #1e2330;
+        border-radius: 10px;
+        border: 1px solid #2d3748;
+        overflow: hidden;
+        margin-top: 30px;
+      }
+      .waitlist-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .waitlist-table th,
+      .waitlist-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #2d3748;
+      }
+      .waitlist-table th {
+        background: linear-gradient(135deg, #d97757 0%, #f4976c 100%);
+        color: #0f1419;
+        font-weight: 600;
+      }
+      .waitlist-table td {
+        color: #e4e7eb;
+      }
+      .waitlist-table tr:last-child td {
+        border-bottom: none;
+      }
+      .stats-admin {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 30px;
+      }
+      .stat-admin {
+        background: #1e2330;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #2d3748;
+        text-align: center;
+        flex: 1;
+        margin: 0 10px;
+      }
+      .stat-admin .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #d97757;
+        margin-bottom: 5px;
+      }
+      .stat-admin .stat-label {
+        color: #9ca3af;
+        font-size: 14px;
+      }
+      .hidden {
+        display: none;
+      }
+      .error-message {
+        color: #ef4444;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-container">
+      <!-- Password Form -->
+      <div id="password-section" class="password-form">
+        <h2>Accès Administrateur</h2>
+        <input
+          type="password"
+          id="password"
+          placeholder="Mot de passe"
+          class="password-input"
+        />
+        <button id="login-btn" class="btn-admin">Se connecter</button>
+        <p id="error-message" class="error-message" style="display: none"></p>
+      </div>
+
+      <!-- Admin Dashboard -->
+      <div id="admin-dashboard" class="hidden">
+        <h1 style="text-align: center; color: #e4e7eb; margin-bottom: 30px">
+          Liste d'attente Chimera
+        </h1>
+
+        <div class="stats-admin">
+          <div class="stat-admin">
+            <div class="stat-value" id="total-count">0</div>
+            <div class="stat-label">Total inscrits</div>
+          </div>
+          <div class="stat-admin">
+            <div class="stat-value" id="today-count">0</div>
+            <div class="stat-label">Inscrits aujourd'hui</div>
+          </div>
+          <div class="stat-admin">
+            <div class="stat-value" id="week-count">0</div>
+            <div class="stat-label">Inscrits cette semaine</div>
+          </div>
+        </div>
+
+        <div class="waitlist-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Date d'inscription</th>
+              </tr>
+            </thead>
+            <tbody id="waitlist-body">
+              <!-- Waitlist entries will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = window.location.origin;
+      const passwordSection = document.getElementById("password-section");
+      const adminDashboard = document.getElementById("admin-dashboard");
+      const passwordInput = document.getElementById("password");
+      const loginBtn = document.getElementById("login-btn");
+      const errorMessage = document.getElementById("error-message");
+      const waitlistBody = document.getElementById("waitlist-body");
+      const totalCount = document.getElementById("total-count");
+      const todayCount = document.getElementById("today-count");
+      const weekCount = document.getElementById("week-count");
+
+      // Check if already authenticated
+      const urlParams = new URLSearchParams(window.location.search);
+      const authPassword = urlParams.get("auth");
+      if (authPassword === "Ms2chsnnjj&kk") {
+        showDashboard();
+        loadWaitlist();
+      }
+
+      // Login handler
+      loginBtn.addEventListener("click", async () => {
+        const password = passwordInput.value.trim();
+
+        if (!password) {
+          showError("Veuillez entrer le mot de passe");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${API_URL}/api/waitlist/all?password=${encodeURIComponent(
+              password
+            )}`
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            // Update URL with auth param
+            window.history.replaceState(
+              {},
+              "",
+              `${window.location.pathname}?auth=${encodeURIComponent(password)}`
+            );
+            showDashboard();
+            loadWaitlist();
+          } else {
+            showError(data.message || "Mot de passe incorrect");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showError("Erreur de connexion");
+        }
+      });
+
+      // Show error message
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+      }
+
+      // Show admin dashboard
+      function showDashboard() {
+        passwordSection.classList.add("hidden");
+        adminDashboard.classList.remove("hidden");
+      }
+
+      // Load waitlist data
+      async function loadWaitlist() {
+        try {
+          const password = passwordInput.value || urlParams.get("auth");
+          const response = await fetch(
+            `${API_URL}/api/waitlist/all?password=${encodeURIComponent(
+              password
+            )}`
+          );
+          const data = await response.json();
+
+          if (data.success) {
+            displayWaitlist(data.waitlist);
+            calculateStats(data.waitlist);
+          } else {
+            showError("Erreur lors du chargement des données");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showError("Erreur de connexion");
+        }
+      }
+
+      // Display waitlist in table
+      function displayWaitlist(waitlist) {
+        waitlistBody.innerHTML = "";
+
+        waitlist.forEach((entry) => {
+          const row = document.createElement("tr");
+
+          const positionCell = document.createElement("td");
+          positionCell.textContent = `#${entry.position}`;
+          row.appendChild(positionCell);
+
+          const nameCell = document.createElement("td");
+          nameCell.textContent = entry.name || "N/A";
+          row.appendChild(nameCell);
+
+          const emailCell = document.createElement("td");
+          emailCell.textContent = entry.email;
+          row.appendChild(emailCell);
+
+          const dateCell = document.createElement("td");
+          const date = new Date(entry.timestamp);
+          dateCell.textContent = date.toLocaleDateString("fr-FR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          row.appendChild(dateCell);
+
+          waitlistBody.appendChild(row);
+        });
+      }
+
+      // Calculate and display stats
+      function calculateStats(waitlist) {
+        const now = new Date();
+        const today = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        );
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        let todayRegistrations = 0;
+        let weekRegistrations = 0;
+
+        waitlist.forEach((entry) => {
+          const entryDate = new Date(entry.timestamp);
+
+          if (entryDate >= today) {
+            todayRegistrations++;
+          }
+
+          if (entryDate >= weekAgo) {
+            weekRegistrations++;
+          }
+        });
+
+        totalCount.textContent = waitlist.length;
+        todayCount.textContent = todayRegistrations;
+        weekCount.textContent = weekRegistrations;
+      }
+
+      // Allow Enter key to submit password
+      passwordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          loginBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>

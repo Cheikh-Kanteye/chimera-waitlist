@@ -231,9 +231,19 @@ app.get("/api/waitlist/count", async (req, res) => {
   }
 });
 
-// API: Get all waitlist (protected - add auth in production)
+// API: Get all waitlist (protected with password)
 app.get("/api/waitlist/all", async (req, res) => {
   try {
+    const { password } = req.query;
+
+    // Check password
+    if (password !== "Ms2chsnnjj&kk") {
+      return res.status(401).json({
+        success: false,
+        message: "Accès non autorisé",
+      });
+    }
+
     const waitlist = await readWaitlist();
     res.json({
       success: true,
