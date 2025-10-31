@@ -39,35 +39,26 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Path to waitlist data
-const WAITLIST_FILE = path.join(__dirname, "data", "waitlist.json");
-
-// Initialize waitlist file if doesn't exist
-async function initWaitlistFile() {
-  try {
-    await fs.access(WAITLIST_FILE);
-  } catch {
-    await fs.writeFile(WAITLIST_FILE, JSON.stringify([], null, 2));
-  }
-}
-
-// Read waitlist
+// Read waitlist from KV
 async function readWaitlist() {
   try {
-    const data = await fs.readFile(WAITLIST_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch {
+    const data = await kv.get("waitlist");
+    return data || [];
+  } catch (error) {
+    console.error("Error reading waitlist from KV:", error);
     return [];
   }
 }
 
-// Write waitlist
+// Write waitlist to KV
 async function writeWaitlist(data) {
-  await fs.writeFile(WAITLIST_FILE, JSON.stringify(data, null, 2));
+  try {
+    await kv.set("waitlist", data);
+  } catch (error) {
+    console.error("Error writing waitlist to KV:", error);
+    throw error;
+  }
 }
-
-// For local development, use file system
-// In production (Vercel), use serverless functions in api/ directory
 
 // API: Join waitlist
 app.post("/api/waitlist", async (req, res) => {
@@ -217,7 +208,7 @@ app.get("/api/waitlist/all", async (req, res) => {
 
 // Initialize and start server (only for local development)
 if (!process.env.VERCEL) {
-  initWaitlistFile().then(() => {
+  initKVStore().then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Waitlist app running on http://localhost:${PORT}`);
       console.log(`📧 Email configured: ${!!process.env.EMAIL_USER}`);
