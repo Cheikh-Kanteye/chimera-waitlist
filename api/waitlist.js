@@ -1,20 +1,8 @@
-const express = require("express");
+const { kv } = require("@vercel/kv");
 const nodemailer = require("nodemailer");
-const cors = require("cors");
-const fs = require("fs").promises;
-const path = require("path");
-require("dotenv").config();
-
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static("public"));
 
 // Nodemailer transporter
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransporter({
   service: process.env.EMAIL_SERVICE || "gmail",
   auth: {
     user: process.env.EMAIL_USER,
@@ -22,38 +10,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Path to waitlist data
-const WAITLIST_FILE = path.join(__dirname, "data", "waitlist.json");
-
-// Initialize waitlist file if doesn't exist
-async function initWaitlistFile() {
-  try {
-    await fs.access(WAITLIST_FILE);
-  } catch {
-    await fs.writeFile(WAITLIST_FILE, JSON.stringify([], null, 2));
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
   }
-}
 
-// Read waitlist
-async function readWaitlist() {
-  try {
-    const data = await fs.readFile(WAITLIST_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-// Write waitlist
-async function writeWaitlist(data) {
-  await fs.writeFile(WAITLIST_FILE, JSON.stringify(data, null, 2));
-}
-
-// For local development, use file system
-// In production (Vercel), use serverless functions in api/ directory
-
-// API: Join waitlist
-app.post("/api/waitlist", async (req, res) => {
   try {
     const { email, name } = req.body;
 
@@ -65,8 +28,8 @@ app.post("/api/waitlist", async (req, res) => {
       });
     }
 
-    // Read current waitlist
-    const waitlist = await readWaitlist();
+    // Get current waitlist from KV
+    const waitlist = (await kv.get("waitlist")) || [];
 
     // Check if already registered
     if (waitlist.some((entry) => entry.email === email)) {
@@ -85,7 +48,7 @@ app.post("/api/waitlist", async (req, res) => {
     };
 
     waitlist.push(entry);
-    await writeWaitlist(waitlist);
+    await kv.set("waitlist", waitlist);
 
     // Send confirmation email
     if (process.env.EMAIL_USER) {
@@ -164,44 +127,4 @@ app.post("/api/waitlist", async (req, res) => {
       message: "Une erreur est survenue. Veuillez réessayer.",
     });
   }
-});
-
-// API: Get waitlist count
-app.get("/api/waitlist/count", async (req, res) => {
-  try {
-    const waitlist = await readWaitlist();
-    res.json({
-      success: true,
-      count: waitlist.length,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erreur lors de la récupération du compte",
-    });
-  }
-});
-
-// API: Get all waitlist (protected - add auth in production)
-app.get("/api/waitlist/all", async (req, res) => {
-  try {
-    const waitlist = await readWaitlist();
-    res.json({
-      success: true,
-      waitlist,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Erreur lors de la récupération de la waitlist",
-    });
-  }
-});
-
-// Initialize and start server
-initWaitlistFile().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Waitlist app running on http://localhost:${PORT}`);
-    console.log(`📧 Email configured: ${!!process.env.EMAIL_USER}`);
-  });
-});
+}

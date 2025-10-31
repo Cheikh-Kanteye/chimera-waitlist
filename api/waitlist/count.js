@@ -1,0 +1,23 @@
+const { kv } = require("@vercel/kv");
+
+export default async function handler(req, res) {
+  if (req.method !== "GET") {
+    return res
+      .status(405)
+      .json({ success: false, message: "Method not allowed" });
+  }
+
+  try {
+    const waitlist = (await kv.get("waitlist")) || [];
+    res.json({
+      success: true,
+      count: waitlist.length,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération du compte",
+    });
+  }
+}
