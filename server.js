@@ -198,10 +198,12 @@ app.get("/api/waitlist/all", async (req, res) => {
   }
 });
 
-// Initialize and start server
-initWaitlistFile().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Waitlist app running on http://localhost:${PORT}`);
-    console.log(`📧 Email configured: ${!!process.env.EMAIL_USER}`);
+// Initialize and start server (only for local development)
+if (!process.env.VERCEL) {
+  initWaitlistFile().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Waitlist app running on http://localhost:${PORT}`);
+      console.log(`📧 Email configured: ${!!process.env.EMAIL_USER}`);
+    });
   });
-});
+}
