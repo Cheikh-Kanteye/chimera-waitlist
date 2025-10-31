@@ -1,12 +1,24 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
-const fs = require("fs").promises;
 const path = require("path");
 require("dotenv").config();
+const { kv } = require("@vercel/kv");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize KV store with empty array if it doesn't exist
+async function initKVStore() {
+  try {
+    const exists = await kv.exists("waitlist");
+    if (!exists) {
+      await kv.set("waitlist", []);
+    }
+  } catch (error) {
+    console.error("Error initializing KV store:", error);
+  }
+}
 
 // Middleware
 app.use(cors());
