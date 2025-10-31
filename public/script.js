@@ -1,10 +1,6 @@
 // API URL (change in production)
 const API_URL = window.location.origin;
 
-// Vercel Analytics
-import { inject } from "@vercel/analytics";
-inject();
-
 // Elements
 const form = document.getElementById("waitlist-form");
 const submitBtn = document.getElementById("submit-btn");
