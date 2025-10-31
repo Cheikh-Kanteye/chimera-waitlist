@@ -237,7 +237,7 @@ app.get("/api/waitlist/all", async (req, res) => {
     const { password } = req.query;
 
     // Check password
-    if (password !== "Ms2chsnnjj&kk") {
+    if (password !== process.env.ADMIN_PASSWORD) {
       return res.status(401).json({
         success: false,
         message: "Accès non autorisé",
