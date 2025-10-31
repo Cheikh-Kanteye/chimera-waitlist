@@ -207,3 +207,6 @@ if (!process.env.VERCEL) {
     });
   });
 }
+
+// Export for Vercel serverless deployment
+module.exports = app;
